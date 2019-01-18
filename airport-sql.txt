@@ -1,0 +1,103 @@
+﻿CREATE TABLE AIRCRAFT_TYPE_DESIGNATOR (
+	ID_type VARCHAR(8) NOT NULL,
+	PRIMARY KEY (ID_type)
+);
+
+CREATE TABLE AIRLINE(
+    ID_airline VARCHAR(30) NOT NULL,
+    no_of_destinations SMALLINT NOT NULL,
+    base TINYTEXT NOT NULL,
+    PRIMARY KEY(ID_airline)
+    );
+
+CREATE TABLE AIRPLANE(
+    ID_airplane VARCHAR(4) NOT NULL,
+    no_of_seats SMALLINT NOT NULL,
+    weight SMALLINT NOT NULL,
+    airline VARCHAR(20) NOT NULL,
+    ID_type VARCHAR(8) NOT NULL,
+    FOREIGN KEY(ID_type) REFERENCES AIRCRAFT_TYPE_DESIGNATOR(ID_type) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(airline) REFERENCES AIRLINE(ID_airline) ON DELETE CASCADE ON UPDATE CASCADE,
+    PRIMARY KEY(ID_airplane)
+    );
+
+CREATE TABLE PARKING_AREA(
+	ID_area VARCHAR(3) NOT NULL,
+	no_of_seats TINYINT NOT NULL,
+	PRIMARY KEY (ID_area)
+);
+
+CREATE TABLE IS_PLACED_IN(
+	ID_of_placed_airplane VARCHAR(10) NOT NULL,
+	ID_of_airplane_area VARCHAR(10) NOT NULL,
+    FOREIGN KEY(ID_of_placed_airplane) REFERENCES AIRPLANE(ID_airplane) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(ID_of_airplane_area) REFERENCES PARKING_AREA(ID_area)ON DELETE CASCADE ON UPDATE CASCADE,
+	PRIMARY KEY (ID_of_placed_airplane,ID_of_airplane_area),
+	UNIQUE KEY(ID_of_placed_airplane)
+);
+
+
+CREATE TABLE ROUTE (
+	ID_flight VARCHAR(6) NOT NULL,
+	no_of_passengers SMALLINT NOT NULL,
+    ID_airplane VARCHAR(4) NOT NULL,
+    FOREIGN KEY(ID_airplane) REFERENCES AIRPLANE(ID_airplane) ON DELETE CASCADE ON UPDATE CASCADE,
+	PRIMARY KEY (ID_flight)
+);
+
+CREATE TABLE GATE(
+	ID_gate VARCHAR(3) NOT NULL,
+	way_of_transfering VARCHAR(20) NOT NULL DEFAULT 'through tube', 
+	PRIMARY KEY (ID_gate)
+);
+
+CREATE TABLE ARRIVAL (
+	ID_of_arriving_flight VARCHAR(6) NOT NULL,
+	scheduled_arrival_time DATETIME NOT NULL,
+    actual_arrival_time DATETIME , 
+    scheduled_total_time_of_last_flight DECIMAL(3,1) NOT NULL,
+    ID_gate VARCHAR(3) NOT NULL,
+    ID_corridor varchar(3) NOT NULL,
+    ICAO_code VARCHAR(4) NOT NULL,
+	IATA_code VARCHAR(4) NOT NULL,
+	allowed_traversal_time DATETIME,
+    FOREIGN KEY(ID_gate) REFERENCES GATE(ID_gate)ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(ID_corridor) REFERENCES CORRIDOR(ID_corridor)ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(ICAO_code,IATA_code) REFERENCES AIRPORT(ICAO_code,IATA_code)ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(ID_of_arriving_flight) REFERENCES    ROUTE(ID_flight)ON DELETE CASCADE ON UPDATE CASCADE,
+	PRIMARY KEY (ID_of_arriving_flight)
+);
+
+CREATE TABLE DEPARTURE(
+	ID_of_departure_flight VARCHAR(6) NOT NULL,
+	scheduled_departure_time DATETIME NOT NULL,
+    actual_departure_time DATETIME,
+    scheduled_total_time_of_next_flight DECIMAL(3,1) NOT NULL,
+    ID_gate VARCHAR(3) NOT NULL,
+    ID_corridor varchar(3) NOT NULL,
+    ICAO_code VARCHAR(4) NOT NULL,
+	IATA_code VARCHAR(4) NOT NULL,
+	allowed_traversal_time DATETIME ,
+    FOREIGN KEY(ID_gate) REFERENCES GATE(ID_gate)ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(ID_corridor) REFERENCES CORRIDOR(ID_corridor)ON DELETE CASCADE ON UPDATE CASCADE,
+     FOREIGN KEY(ICAO_code,IATA_code) REFERENCES AIRPORT(ICAO_code,IATA_code)ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY(ID_of_departure_flight) REFERENCES    ROUTE(ID_flight)ON DELETE CASCADE ON UPDATE CASCADE,
+	PRIMARY KEY (ID_of_departure_flight)
+);
+
+
+CREATE TABLE AIRPORT (
+	ICAO_code VARCHAR(4) NOT NULL,
+	IATA_code VARCHAR(4) NOT NULL,
+	city VARCHAR(25) NOT NULL,
+	name VARCHAR(35) NOT NULL,
+	country VARCHAR(25) NOT NULL,
+	PRIMARY KEY (ICAO_code,IATA_code)
+);
+
+CREATE TABLE CORRIDOR (
+	ID_corridor varchar(3) NOT NULL,
+	PRIMARY KEY (ID_corridor)
+);
+
+ALTER TABLE GATE ADD CONSTRAINT way_of_transfering_status CHECK (way_of_transfering IN('through tube','with minibus'))
