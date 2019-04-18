@@ -8,3 +8,10 @@ The main goal of this project was to design a database using MySQL of an airport
 * Creation of a database using MySQL
 * Creation of an application using Python
 * Creation of an application using JAVA
+
+
+--- 
+### Licence
+Copyright © 2018 Nick Nikitas
+
+Permission is granted to copy, distribute and/or modify this document under the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation; with no Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.
